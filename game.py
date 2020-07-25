@@ -50,17 +50,32 @@ class Game():
         pygame.display.update()
         self.clock.tick(Config.FPS)
         
+     def checkForKeyPress(self):
+      if len(pygame.event.get(pygame.QUIT)) > 0:
+          pygame.quit()
+
+      keyUpEvents = pygame.event.get(pygame.KEYUP)
+
+      if len(keyUpEvents) == 0:
+          return None
+
+      if keyUpEvents[0].key == pygame.K_ESCAPE:
+          pygame.quit()
+          quit()
+
+      return keyUpEvents[0].key   
+        
     def handleKeyEvents(self, event):
-        if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and self.snake.direction != self.snake.RIGHT:
-            self.snake.direction = self.snake.LEFT
-        elif (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and self.snake.direction != self.snake.LEFT:
-            self.snake.direction = self.snake.RIGHT
-        elif (event.key == pygame.K_UP or event.key == pygame.K_w) and self.snake.direction != self.snake.DOWN:
-            self.snake.direction = self.snake.UP
-        elif (event.key == pygame.K_DOWN or event.key == pygame.K_s) and self.snake.direction != self.snake.UP:
-            self.snake.direction = self.snake.DOWN
-        elif event.key == pygame.K_ESCAPE:
-            pygame.quit()
+    if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and self.snake.direction != self.snake.RIGHT:
+        self.snake.direction = self.snake.LEFT
+    elif (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and self.snake.direction != self.snake.LEFT:
+        self.snake.direction = self.snake.RIGHT
+    elif (event.key == pygame.K_UP or event.key == pygame.K_w) and self.snake.direction != self.snake.DOWN:
+        self.snake.direction = self.snake.UP
+    elif (event.key == pygame.K_DOWN or event.key == pygame.K_s) and self.snake.direction != self.snake.UP:
+        self.snake.direction = self.snake.DOWN
+    elif event.key == pygame.K_ESCAPE:
+        pygame.quit()
             
     def resetGame(self):
         del self.snake
@@ -69,6 +84,15 @@ class Game():
         self.food = Food()
         
         return True
+    
+    def drawPressKeyMsg(self):
+      pressKeySurf = self.BASICFONT.render(
+          'Press a key to play.', True, Config.DARKGRAY)
+      pressKeyRect = pressKeySurf.get_rect()
+      pressKeyRect.topleft = (Config.WINDOW_WIDTH - 200,
+                              Config.WINDOW_HEIGHT - 30)
+      self.screen.blit(pressKeySurf, pressKeyRect)
+    
             
     def isGameOver(self):
         if (self.snake.snakeCoords[self.snake.HEAD]['x'] == - 1 or self.snake.snakeCoords[self.snake.HEAD]['x'] == Config.CELLWIDTH or
@@ -77,6 +101,59 @@ class Game():
         for snakeBody in self.snake.snakeCoords[1:]:
             if snakeBody['x'] == self.snake.snakeCoords[self.snake.HEAD]['x'] and snakeBody['y'] == self.snake.snakeCoords[self.snake.HEAD]['y']:
                 return self.resetGame()
+     def displayGameOver(self):
+      gameOverFont = pygame.font.Font('freesansbold.ttf', 150)
+      gameSurf = gameOverFont.render('Game', True, Config.WHITE)
+      overSurf = gameOverFont.render('Over', True, Config.WHITE)
+      gameRect = gameSurf.get_rect()
+      overRect = overSurf.get_rect()
+      gameRect.midtop = (Config.WINDOW_WIDTH / 2, 10)
+      overRect.midtop = (Config.WINDOW_WIDTH / 2, gameRect.height + 10 + 25)
+      self.screen.blit(gameSurf, gameRect)
+      self.screen.blit(overSurf, overRect)
+
+      self.drawPressKeyMsg()
+      pygame.display.update()
+      pygame.time.wait(500)
+
+      self.checkForKeyPress()  # clear out any key presses in the event queue
+      while True:
+          if self.checkForKeyPress():
+              pygame.event.get()  # clear event queue
+              return
+
+  def showStartScreen(self):
+      titleFont = pygame.font.Font('freesansbold.ttf', 100)
+      titleSurf1 = titleFont.render(
+          'Wormy!', True, Config.WHITE, Config.DARKGREEN)
+      titleSurf2 = titleFont.render('Wormy!', True, Config.GREEN)
+      degrees1 = 0
+      degrees2 = 0
+
+      while True:
+          for event in pygame.event.get():
+              if event.type == pygame.KEYDOWN:
+                  return
+          self.screen.fill(Config.BG_COLOR)
+          rotatedSurf1 = pygame.transform.rotate(titleSurf1, degrees1)
+          rotatedRect1 = rotatedSurf1.get_rect()
+          rotatedRect1.center = (Config.WINDOW_WIDTH / 2,
+                                  Config.WINDOW_HEIGHT / 2)
+          self.screen.blit(rotatedSurf1, rotatedRect1)
+
+          rotatedSurf2 = pygame.transform.rotate(titleSurf2, degrees2)
+          rotatedRect2 = rotatedSurf2.get_rect()
+          rotatedRect2.center = (Config.WINDOW_WIDTH / 2,
+                                  Config.WINDOW_HEIGHT / 2)
+          self.screen.blit(rotatedSurf2, rotatedRect2)
+
+          self.drawPressKeyMsg()
+
+          pygame.display.update()
+          self.clock.tick(Config.MENU_FPS)
+          degrees1 += 1  # rotate by 3 degrees each frame
+          degrees2 += 2  # rotate by 7 degrees each frame
+    
     def run(self):
         while True:
             self.gameLoop()
