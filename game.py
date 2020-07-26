@@ -1,7 +1,9 @@
 from config import Config
 from snake import Snake
 from food import Food
-import pygame,  sys
+import pygame
+import sys
+
 
 class Game():
     def __init__(self):
@@ -13,33 +15,40 @@ class Game():
         pygame.display.set_caption('Snake')
         self.food = Food()
         self.snake = Snake()
-        
+
     def drawGrid(self):
-        for x in range(0, Config.WINDOW_WIDTH, Config.CELLSIZE): #draw vertical lines
-            pygame.draw.line(self.screen, Config.DARKGRAY, (x, 0), (x, Config.WINDOW_HEIGHT))
-            
-        for y in range(0, Config.WINDOW_HEIGHT, Config.CELLSIZE): #draw horizontal lines
-            pygame.draw.line(self.screen, Config.DARKGRAY, (0, y), (Config.WINDOW_WIDTH, y))
-            
+        for x in range(0, Config.WINDOW_WIDTH, Config.CELLSIZE):  # draw vertical lines
+            pygame.draw.line(self.screen, Config.DARKGRAY,
+                             (x, 0), (x, Config.WINDOW_HEIGHT))
+
+        for y in range(0, Config.WINDOW_HEIGHT, Config.CELLSIZE):  # draw horizontal lines
+            pygame.draw.line(self.screen, Config.DARKGRAY,
+                             (0, y), (Config.WINDOW_WIDTH, y))
+
     def drawSnake(self):
         for coord in self.snake.snakeCoords:
             x = coord['x'] * Config.CELLSIZE
             y = coord['y'] * Config.CELLSIZE
-            snakeSegmentRect = pygame.Rect(x, y, Config.CELLSIZE, Config.CELLSIZE)
+            snakeSegmentRect = pygame.Rect(
+                x, y, Config.CELLSIZE, Config.CELLSIZE)
             pygame.draw.rect(self.screen, Config.DARKGREEN, snakeSegmentRect)
-            snakeInnnerSegmentRect = pygame.Rect(x + 4, y + 4, Config.CELLSIZE - 8, Config.CELLSIZE - 8)
+            snakeInnnerSegmentRect = pygame.Rect(
+                x + 4, y + 4, Config.CELLSIZE - 8, Config.CELLSIZE - 8)
             pygame.draw.rect(self.screen, Config.GREEN, snakeInnnerSegmentRect)
+
     def drawFood(self):
         x = self.food.x * Config.CELLSIZE
         y = self.food.x * Config.CELLSIZE
         foodRect = pygame.Rect(x, y, Config.CELLSIZE, Config.CELLSIZE)
         pygame.draw.rect(self.screen, Config.RED, foodRect)
+
     def drawScore(self, score):
-        scoreSurf = self.BASICFONT.render('Score: %s' % (score), True, Config.WHITE)
+        scoreSurf = self.BASICFONT.render(
+            'Score: %s' % (score), True, Config.WHITE)
         scoreRect = scoreSurf.get_rect()
         scoreRect.topleft = (Config.WINDOW_WIDTH - 120, 10)
         self.screen.blit(scoreSurf, scoreRect)
-    
+
     def draw(self):
         self.screen.fill(Config.BG_COLOR)
         # we'll draw our snake, grid, food, score
@@ -49,8 +58,8 @@ class Game():
         self.drawScore(len(self.snake.snakeCoords) - 3)
         pygame.display.update()
         self.clock.tick(Config.FPS)
-        
-     def checkForKeyPress(self):
+
+    def checkForKeyPress(self):
       if len(pygame.event.get(pygame.QUIT)) > 0:
           pygame.quit()
 
@@ -66,16 +75,16 @@ class Game():
       return keyUpEvents[0].key   
         
     def handleKeyEvents(self, event):
-    if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and self.snake.direction != self.snake.RIGHT:
-        self.snake.direction = self.snake.LEFT
-    elif (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and self.snake.direction != self.snake.LEFT:
-        self.snake.direction = self.snake.RIGHT
-    elif (event.key == pygame.K_UP or event.key == pygame.K_w) and self.snake.direction != self.snake.DOWN:
-        self.snake.direction = self.snake.UP
-    elif (event.key == pygame.K_DOWN or event.key == pygame.K_s) and self.snake.direction != self.snake.UP:
-        self.snake.direction = self.snake.DOWN
-    elif event.key == pygame.K_ESCAPE:
-        pygame.quit()
+        if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and self.snake.direction != self.snake.RIGHT:
+            self.snake.direction = self.snake.LEFT
+        elif (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and self.snake.direction != self.snake.LEFT:
+            self.snake.direction = self.snake.RIGHT
+        elif (event.key == pygame.K_UP or event.key == pygame.K_w) and self.snake.direction != self.snake.DOWN:
+            self.snake.direction = self.snake.UP
+        elif (event.key == pygame.K_DOWN or event.key == pygame.K_s) and self.snake.direction != self.snake.UP:
+            self.snake.direction = self.snake.DOWN
+        elif event.key == pygame.K_ESCAPE:
+            pygame.quit()
             
     def resetGame(self):
         del self.snake
@@ -101,7 +110,7 @@ class Game():
         for snakeBody in self.snake.snakeCoords[1:]:
             if snakeBody['x'] == self.snake.snakeCoords[self.snake.HEAD]['x'] and snakeBody['y'] == self.snake.snakeCoords[self.snake.HEAD]['y']:
                 return self.resetGame()
-     def displayGameOver(self):
+    def displayGameOver(self):
       gameOverFont = pygame.font.Font('freesansbold.ttf', 150)
       gameSurf = gameOverFont.render('Game', True, Config.WHITE)
       overSurf = gameOverFont.render('Over', True, Config.WHITE)
@@ -122,11 +131,11 @@ class Game():
               pygame.event.get()  # clear event queue
               return
 
-  def showStartScreen(self):
+    def showStartScreen(self):
       titleFont = pygame.font.Font('freesansbold.ttf', 100)
       titleSurf1 = titleFont.render(
-          'Wormy!', True, Config.WHITE, Config.DARKGREEN)
-      titleSurf2 = titleFont.render('Wormy!', True, Config.GREEN)
+          'Snake!', True, Config.WHITE, Config.DARKGREEN)
+      titleSurf2 = titleFont.render('Sanke!', True, Config.GREEN)
       degrees1 = 0
       degrees2 = 0
 
@@ -155,6 +164,8 @@ class Game():
           degrees2 += 2  # rotate by 7 degrees each frame
     
     def run(self):
+        self.showStartScreen()
+        
         while True:
             self.gameLoop()
             self.displayGameOver()
@@ -165,7 +176,7 @@ class Game():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                 elif event.type == pygame.KEYDOWN:
-                    self.handlekeyEvents(event)
+                    self.handleKeyEvents(event)
                     
             self.snake.update(self.food)
             self.draw()
